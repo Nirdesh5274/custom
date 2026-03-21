@@ -1,0 +1,17 @@
+<svg width="1200" height="620" viewBox="0 0 1200 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="620" fill="#F0F4FA"/>
+  <rect x="130" y="70" width="940" height="120" rx="10" fill="#FF7A1A"/>
+  <rect x="130" y="190" width="940" height="120" rx="10" fill="#FFFFFF"/>
+  <rect x="130" y="310" width="940" height="120" rx="10" fill="#0B6B45"/>
+  <rect x="130" y="432" width="940" height="120" rx="10" fill="#E6EDF7"/>
+  <circle cx="600" cy="250" r="40" fill="#1F4E79"/>
+  <circle cx="600" cy="250" r="24" fill="#EAF2FB"/>
+  <rect x="545" y="435" width="110" height="140" rx="20" fill="#233C5C"/>
+  <rect x="460" y="455" width="95" height="120" rx="18" fill="#35597F"/>
+  <rect x="645" y="455" width="95" height="120" rx="18" fill="#35597F"/>
+  <rect x="310" y="460" width="120" height="95" rx="15" fill="#6A8EB2"/>
+  <rect x="770" y="460" width="120" height="95" rx="15" fill="#6A8EB2"/>
+  <text x="600" y="606" text-anchor="middle" font-family="Verdana, sans-serif" font-size="26" font-weight="700" fill="#29486A">
+    Official Ceremonial Gallery Placeholder
+  </text>
+</svg>
