@@ -28,12 +28,12 @@ export function LoginForm() {
 
     setIsLoading(false);
 
-    if (result?.error) {
+    if (!result || result.error) {
       setError("Invalid credentials. Please try again.");
       return;
     }
 
-    router.push(callbackUrl);
+    router.replace(result.url ?? callbackUrl);
     router.refresh();
   }
 
