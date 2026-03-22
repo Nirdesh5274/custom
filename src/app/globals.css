@@ -38,6 +38,12 @@ html {
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 .font-heading {
   font-family: var(--font-heading), serif;
 }
