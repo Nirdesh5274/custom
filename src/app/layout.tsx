@@ -66,7 +66,7 @@ export default async function RootLayout({
   });
 
   return (
-    <html lang="en" className={`${headingFont.variable} ${bodyFont.variable} h-full antialiased`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${headingFont.variable} ${bodyFont.variable} h-full antialiased`}>
       <body id="top" className="portal-bg min-h-full text-slate-900">
         <div className="flex min-h-screen flex-col">
           <SiteHeader headerMegaMenu={dynamicMegaMenu} />

@@ -1,23 +1,29 @@
-"use client";
+import { prisma } from "@/lib/prisma";
 
-import { useEffect, useState } from "react";
+const VISITOR_KEY = "visitor_count";
 
-export function VisitorCounter() {
-  const [count, setCount] = useState<number | null>(null);
+export async function VisitorCounter() {
+  let count: number | null = null;
 
-  useEffect(() => {
-    // Increment visitor count on first page load
-    fetch("/api/public/visitors", { method: "POST" })
-      .then((r) => r.json())
-      .then((data) => setCount(data.count))
-      .catch(() => {
-        // Fallback: just read the current count
-        fetch("/api/public/visitors")
-          .then((r) => r.json())
-          .then((data) => setCount(data.count))
-          .catch(() => setCount(null));
-      });
-  }, []);
+  try {
+    const current = await prisma.siteSetting.findUnique({
+      where: { key: VISITOR_KEY },
+      select: { value: true },
+    });
+
+    const currentVal = current ? parseInt(current.value, 10) || 0 : 0;
+    const nextVal = currentVal + 1;
+
+    await prisma.siteSetting.upsert({
+      where: { key: VISITOR_KEY },
+      update: { value: String(nextVal) },
+      create: { key: VISITOR_KEY, value: String(nextVal) },
+    });
+
+    count = nextVal;
+  } catch {
+    count = null;
+  }
 
   if (count === null) {
     return (

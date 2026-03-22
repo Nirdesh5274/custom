@@ -34,7 +34,7 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
-html {
+html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
