@@ -7,6 +7,14 @@ import { requireAdmin } from "@/lib/require-admin";
 
 export default async function AdminDashboardPage() {
   const session = await requireAdmin();
+  const editableSettingKeys = new Set([
+    "ticker_message",
+    "about_us_p1",
+    "about_us_p2",
+    "about_us_p3",
+    "helpline_title",
+    "helpline_subtitle",
+  ]);
 
   if (!session) {
     redirect("/admin/login");
@@ -20,6 +28,15 @@ export default async function AdminDashboardPage() {
   ]);
 
   const configMap = siteSettings.reduce((acc, obj) => { acc[obj.key] = obj.value; return acc; }, {} as Record<string, string>);
+  const latestEditableSavedAt = siteSettings
+    .filter((entry) => editableSettingKeys.has(entry.key))
+    .reduce<Date | null>((latest, entry) => {
+      if (!latest || entry.updatedAt > latest) {
+        return entry.updatedAt;
+      }
+      return latest;
+    }, null)
+    ?.toISOString() ?? null;
   
   const defaultSettings = {
     ticker_message: configMap["ticker_message"] || "All IEC holders and CBs are requested to create their ICEGATE ID and submit PAN based payment details.",
@@ -81,7 +98,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="mt-6">
-          <SettingsForm settings={defaultSettings} />
+          <SettingsForm settings={defaultSettings} initialLastSavedAt={latestEditableSavedAt} />
         </div>
 
         <div className="mt-6 rounded-2xl border border-[#d0dceb] bg-white/70 p-4 text-sm text-[#4b6077]">

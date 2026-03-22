@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { airportFeatureCards, chiefFeatureCards, leaders, portFeatureCards } from "@/lib/portal-data";
 import { formatDate, shortenText } from "@/lib/utils";
 import { HeroSlider } from "@/components/hero-slider";
+import { PhotoGallerySlider } from "@/components/photo-gallery-slider";
 
 export const dynamic = "force-dynamic";
 
@@ -101,8 +102,8 @@ export default async function Home() {
           </div>
         </div>
         <div className="mt-6 grid gap-4 grid-cols-2 md:mt-8 md:grid-cols-2 xl:grid-cols-4">
-          {displayLeaders.slice(1).map((leader) => (
-            <article key={leader.name} className="gov-feature-card overflow-hidden">
+          {displayLeaders.slice(1).map((leader, index) => (
+            <article key={`${leader.name}-${leader.image}-${index}`} className="gov-feature-card overflow-hidden">
               <Image src={leader.image} alt={leader.name} width={420} height={520} className="h-[180px] w-full object-cover md:h-[240px]" />
               <div className="bg-white p-3 text-center md:p-4">
                 <h3 className="text-base font-black text-[#1b2f4a] md:text-xl">{leader.name}</h3>
@@ -130,11 +131,11 @@ export default async function Home() {
         <h2 className="portal-title">Chief Commissionerate</h2>
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {chiefCards.map((card) => (
-            <Link key={card.title} href={card.href} className="gov-feature-card p-6">
-              <span className="text-5xl text-[#3b8cf1]">◔</span>
+            <Link key={card.title} href={card.href} className="gov-feature-card gov-feature-card-animated group relative overflow-hidden p-6">
+              <span className="card-orb text-5xl text-[#3b8cf1]">◔</span>
               <h3 className="home-card-title mt-5">{card.title}</h3>
               <p className="home-card-subtitle">{card.subtitle}</p>
-              <p className="home-read-more">Read More.</p>
+              <p className="home-read-more">Read More <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">&gt;</span></p>
             </Link>
           ))}
         </div>
@@ -145,11 +146,11 @@ export default async function Home() {
         <h2 className="portal-title">Commissionerate of Customs (Port)</h2>
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {portCards.map((card) => (
-            <Link key={card.title} href={card.href} className="gov-feature-card p-6">
-              <span className="text-5xl text-[#3b8cf1]">◔</span>
+            <Link key={card.title} href={card.href} className="gov-feature-card gov-feature-card-animated group relative overflow-hidden p-6">
+              <span className="card-orb text-5xl text-[#3b8cf1]">◔</span>
               <h3 className="home-card-title mt-5">{card.title}</h3>
               <p className="home-card-subtitle">{card.subtitle}</p>
-              <p className="home-read-more">Read More.</p>
+              <p className="home-read-more">Read More <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">&gt;</span></p>
             </Link>
           ))}
         </div>
@@ -160,11 +161,11 @@ export default async function Home() {
         <h2 className="portal-title">Commissionerate of Customs (Airport)</h2>
         <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {airportCards.map((card) => (
-            <Link key={card.title} href={card.href} className="gov-feature-card p-6">
-              <span className="text-5xl text-[#3b8cf1]">◔</span>
+            <Link key={card.title} href={card.href} className="gov-feature-card gov-feature-card-animated group relative overflow-hidden p-6">
+              <span className="card-orb text-5xl text-[#3b8cf1]">◔</span>
               <h3 className="home-card-title mt-5">{card.title}</h3>
               <p className="home-card-subtitle">{card.subtitle}</p>
-              <p className="home-read-more">Read More.</p>
+              <p className="home-read-more">Read More <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">&gt;</span></p>
             </Link>
           ))}
         </div>
@@ -178,20 +179,17 @@ export default async function Home() {
             <div className="mt-4 h-1 w-20 rounded-full bg-[#3b8cf1] md:w-28" />
             <p className="mt-4 text-sm text-[#4f657d] md:text-lg">Showcasing key customs initiatives and national events.</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-            {(galleryItems.length > 0
-              ? galleryItems
-              : [
-                  { imageUrl: "/gallery/gallery-1.svg", title: "Official Event 1" },
-                  { imageUrl: "/gallery/gallery-2.svg", title: "Official Event 2" },
-                  { imageUrl: "/gallery/gallery-3.svg", title: "Official Event 3" },
-                ]
-            ).map((image) => (
-              <article key={image.imageUrl + image.title} className="gov-feature-card overflow-hidden">
-                <img src={image.imageUrl} alt={image.title} className="h-[140px] w-full object-cover md:h-[220px]" />
-              </article>
-            ))}
-          </div>
+          <PhotoGallerySlider
+            items={
+              galleryItems.length > 0
+                ? galleryItems.map((item) => ({ imageUrl: item.imageUrl, title: item.title }))
+                : [
+                    { imageUrl: "/gallery/gallery-1.svg", title: "Official Event 1" },
+                    { imageUrl: "/gallery/gallery-2.svg", title: "Official Event 2" },
+                    { imageUrl: "/gallery/gallery-3.svg", title: "Official Event 3" },
+                  ]
+            }
+          />
         </div>
       </section>
 

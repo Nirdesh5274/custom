@@ -1,11 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
+import { enforceIpRateLimit, enforceTrustedOrigin } from "@/lib/request-security";
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const originBlock = enforceTrustedOrigin(req);
+  if (originBlock) {
+    return originBlock;
+  }
+
+  const rateLimitBlock = enforceIpRateLimit(req, {
+    keyPrefix: "admin-files-delete",
+    limit: 30,
+    windowMs: 60_000,
+  });
+  if (rateLimitBlock) {
+    return rateLimitBlock;
+  }
+
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 

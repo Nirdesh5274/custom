@@ -271,6 +271,67 @@ html {
   box-shadow: 0 14px 24px rgba(9, 28, 47, 0.11);
 }
 
+.gov-feature-card-animated {
+  isolation: isolate;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.gov-feature-card-animated::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(150deg, rgba(17, 48, 83, 0.96) 0%, rgba(30, 74, 121, 0.92) 62%, rgba(47, 112, 181, 0.9) 100%);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.gov-feature-card-animated::after {
+  content: "";
+  position: absolute;
+  top: -70%;
+  left: -55%;
+  width: 130%;
+  height: 240%;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.16) 45%, rgba(255, 255, 255, 0) 66%);
+  opacity: 0;
+  transform: translateX(-16%);
+  transition: transform 600ms ease, opacity 300ms ease;
+  pointer-events: none;
+}
+
+.gov-feature-card-animated:hover {
+  transform: translateY(-4px);
+  border-color: #2f6ba8;
+  box-shadow: 0 18px 30px rgba(10, 31, 54, 0.2);
+}
+
+.gov-feature-card-animated:hover::before {
+  opacity: 1;
+}
+
+.gov-feature-card-animated:hover::after {
+  opacity: 1;
+  transform: translateX(62%);
+}
+
+.gov-feature-card-animated:hover .home-card-title,
+.gov-feature-card-animated:hover .home-card-subtitle,
+.gov-feature-card-animated:hover .home-read-more {
+  color: #f2f8ff;
+}
+
+.card-orb {
+  display: inline-block;
+  transition: transform 260ms ease, color 260ms ease, text-shadow 260ms ease;
+}
+
+.gov-feature-card-animated:hover .card-orb {
+  transform: scale(1.08) rotate(-8deg);
+  color: #9eceff;
+  text-shadow: 0 6px 20px rgba(115, 175, 246, 0.42);
+}
+
 .mini-badge {
   display: inline-block;
   border-radius: 6px;
@@ -365,5 +426,9 @@ html {
   .mini-badge {
     font-size: 0.72rem;
     padding: 0.3rem 0.6rem;
+  }
+
+  .gov-feature-card-animated:hover {
+    transform: translateY(-2px);
   }
 }

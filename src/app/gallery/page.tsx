@@ -1,5 +1,6 @@
 import { InnerPageShell } from "@/components/inner-page-shell";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 
 export default async function GalleryPage({
   searchParams,
@@ -59,7 +60,13 @@ export default async function GalleryPage({
         {items.length > 0 ? (
           items.map((item) => (
             <article key={item.id} className="gov-card rounded-2xl p-3">
-              <img src={item.imageUrl} alt={item.title} className="h-52 w-full rounded-xl object-cover" />
+              <Image
+                src={item.imageUrl}
+                alt={item.title}
+                width={1200}
+                height={800}
+                className="h-52 w-full rounded-xl object-cover"
+              />
               <h3 className="mt-3 text-base font-bold text-[#10395d]">{item.title}</h3>
               <p className="text-sm text-[#4d627a]">{item.caption}</p>
               <p className="mt-1 text-xs font-semibold text-[#6b7f95]">Section: {item.section}</p>

@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function PageForm({ initialData }: { initialData?: any }) {
+type PageFormInitialData = {
+  id?: string;
+  title?: string;
+  slug?: string;
+  content?: string;
+};
+
+export function PageForm({ initialData }: { initialData?: PageFormInitialData }) {
   const router = useRouter();
   const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");

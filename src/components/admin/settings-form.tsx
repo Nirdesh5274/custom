@@ -1,32 +1,57 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type SettingsFormProps = {
   settings: Record<string, string>;
+  initialLastSavedAt?: string | null;
 };
 
-export function SettingsForm({ settings: initialSettings }: SettingsFormProps) {
+export function SettingsForm({ settings: initialSettings, initialLastSavedAt = null }: SettingsFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState(initialSettings);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [errorText, setErrorText] = useState<string | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(initialLastSavedAt);
+
+  const formattedLastSavedAt = lastSavedAt
+    ? new Date(lastSavedAt).toLocaleString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
 
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("saving");
-
-    const promises = Object.entries(form).map(([key, value]) =>
-      fetch("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key, value }),
-      })
-    );
+    setErrorText(null);
 
     try {
-      await Promise.all(promises);
+      const response = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          settings: Object.entries(form).map(([key, value]) => ({ key, value })),
+        }),
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || "Save failed");
+      }
+
+      const result: { savedAt?: string } = await response.json();
+
       setStatus("saved");
-    } catch (e) {
+      setLastSavedAt(result.savedAt ?? new Date().toISOString());
+      router.refresh();
+    } catch (error) {
       setStatus("error");
+      setErrorText(error instanceof Error ? error.message : "Save failed");
     }
   }
 
@@ -38,6 +63,9 @@ export function SettingsForm({ settings: initialSettings }: SettingsFormProps) {
     <form onSubmit={handleSave} className="admin-card p-5">
       <h3 className="font-heading text-xl font-black text-[#0d2f52]">App Content Settings</h3>
       <p className="mt-1 mb-4 text-sm text-[#4b6077]">Modify the text blocks and titles displayed on the homepage.</p>
+      {formattedLastSavedAt ? (
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#456385]">Last saved: {formattedLastSavedAt}</p>
+      ) : null}
       
       <div className="space-y-4">
         <div>
@@ -72,7 +100,7 @@ export function SettingsForm({ settings: initialSettings }: SettingsFormProps) {
         {status === "saving" ? "Saving..." : "Save all text settings"}
       </button>
       {status === "saved" ? <p className="mt-2 text-sm text-emerald-700">All configurations successfully saved.</p> : null}
-      {status === "error" ? <p className="mt-2 text-sm text-red-600">Save failed. Settings schema validation might have failed.</p> : null}
+      {status === "error" ? <p className="mt-2 text-sm text-red-600">Save failed. {errorText ?? "Please retry."}</p> : null}
     </form>
   );
 }

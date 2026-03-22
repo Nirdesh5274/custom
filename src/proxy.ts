@@ -10,11 +10,14 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/admin")) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({
+      req: request,
+      secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+    });
 
-    if (!token) {
+    if (!token || token.role !== "ADMIN") {
       const signInUrl = new URL("/admin/login", request.url);
-      signInUrl.searchParams.set("callbackUrl", pathname);
+      signInUrl.searchParams.set("callbackUrl", `${pathname}${request.nextUrl.search}`);
       return NextResponse.redirect(signInUrl);
     }
   }

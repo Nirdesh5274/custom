@@ -15,14 +15,19 @@ export async function GET(
     }
 
     const buffer = Buffer.from(file.data, "base64");
+    const isSvg = file.mimetype === "image/svg+xml";
+    const disposition = isSvg ? "attachment" : "inline";
 
     return new NextResponse(buffer, {
       status: 200,
       headers: {
         "Content-Type": file.mimetype,
-        "Content-Disposition": `inline; filename="${file.filename}"`,
+        "Content-Disposition": `${disposition}; filename="${file.filename}"`,
         "Cache-Control": "public, max-age=31536000, immutable",
         "Content-Length": String(buffer.length),
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; sandbox;",
+        "Referrer-Policy": "no-referrer",
       },
     });
   } catch {

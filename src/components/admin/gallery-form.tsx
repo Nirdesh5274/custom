@@ -40,7 +40,7 @@ export function GalleryForm({ mode, galleryId, initialValue }: GalleryFormProps)
     setError(null);
     setIsSaving(true);
 
-    let finalImageUrl = form.imageUrl;
+    let finalImageUrl = form.imageUrl.trim();
 
     if (selectedFile) {
       const formData = new FormData();
@@ -65,6 +65,12 @@ export function GalleryForm({ mode, galleryId, initialValue }: GalleryFormProps)
       return;
     }
 
+    if (finalImageUrl.startsWith("/uploads/") || /^https?:\/\/localhost(?::\d+)?\/uploads\//i.test(finalImageUrl)) {
+      setError("Legacy /uploads URL not allowed. Please upload file again so it is stored in MongoDB.");
+      setIsSaving(false);
+      return;
+    }
+
     const payloadToSubmit = { ...payload, imageUrl: finalImageUrl };
 
     const endpoint = mode === "create" ? "/api/admin/gallery" : `/api/admin/gallery/${galleryId}`;
@@ -79,7 +85,8 @@ export function GalleryForm({ mode, galleryId, initialValue }: GalleryFormProps)
     setIsSaving(false);
 
     if (!response.ok) {
-      setError("Unable to save gallery item. Check all fields and retry.");
+      const message = await response.text();
+      setError(message || "Unable to save gallery item. Check all fields and retry.");
       return;
     }
 

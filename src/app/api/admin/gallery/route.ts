@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
 import { galleryInputSchema } from "@/lib/validators";
+import { enforceIpRateLimit, enforceTrustedOrigin } from "@/lib/request-security";
 
 export async function GET() {
   const session = await requireAdmin();
@@ -17,6 +18,20 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const originBlock = enforceTrustedOrigin(request);
+  if (originBlock) {
+    return originBlock;
+  }
+
+  const rateLimitBlock = enforceIpRateLimit(request, {
+    keyPrefix: "admin-gallery-write",
+    limit: 50,
+    windowMs: 60_000,
+  });
+  if (rateLimitBlock) {
+    return rateLimitBlock;
+  }
+
   const session = await requireAdmin();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

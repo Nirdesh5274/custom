@@ -54,12 +54,31 @@ npm run dev
 - Public site: http://localhost:3000
 - Admin login: http://localhost:3000/admin/login
 
-## Default Admin Credentials
+## Admin Credentials (No Hardcoded Defaults)
 
-- Email: admin@custom.gov.in
-- Password: Admin@123
+Admin credentials are stored in database table `User` as `passwordHash` (bcrypt hash), not plain text.
 
-Change these values in `.env` before production.
+Set credentials before seeding:
+
+```bash
+set ADMIN_EMAIL=admin@custom.gov.in
+set ADMIN_PASSWORD=YourStrongPasswordHere
+npm run db:seed
+```
+
+PowerShell:
+
+```powershell
+$env:ADMIN_EMAIL="admin@custom.gov.in"
+$env:ADMIN_PASSWORD="YourStrongPasswordHere"
+npm run db:seed
+```
+
+Change password later anytime:
+
+```bash
+npm run admin:password -- admin@custom.gov.in NewStrongPasswordHere
+```
 
 ## Useful Commands
 

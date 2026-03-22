@@ -4,7 +4,7 @@ import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { prisma } from "@/lib/prisma";
-import { headerMegaMenu } from "@/lib/portal-data";
+import { headerMegaMenu, MegaMenuEntry, MegaMenuSection } from "@/lib/portal-data";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +35,7 @@ export default async function RootLayout({
   });
 
   // Group dynamic menus by section (e.g. MenuPort)
-  const menuMap: Record<string, { label: string; href?: string; sections?: any[] }> = {};
+  const menuMap: Record<string, MegaMenuEntry> = {};
 
   for (const item of customMenus) {
     const sectionName = item.section; // e.g. "MenuPort"
@@ -46,10 +46,10 @@ export default async function RootLayout({
     }
     
     const menuObj = menuMap[sectionName];
-    let group = menuObj.sections?.find(s => s.title === groupTitle);
+    let group = menuObj.sections?.find((section) => section.title === groupTitle);
     
     if (!group) {
-      group = { title: groupTitle, items: [] };
+      group = { title: groupTitle, items: [] } as MegaMenuSection;
       menuObj.sections?.push(group);
     }
     

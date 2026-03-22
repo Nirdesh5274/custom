@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { InnerPageShell } from "@/components/inner-page-shell";
 import { Metadata } from "next";
+import { sanitizeRichHtml } from "@/lib/html-sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,8 @@ export default async function GenericPage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
+  const safeHtml = sanitizeRichHtml(page.content);
+
   return (
     <InnerPageShell
       title={page.title}
@@ -33,7 +36,7 @@ export default async function GenericPage({ params }: { params: Promise<{ slug: 
       <div 
         className="prose prose-slate max-w-none md:prose-lg prose-headings:font-heading prose-headings:text-[#1b2f4a] prose-a:text-[#2f80ed]"
         style={{ whiteSpace: "pre-wrap" }}
-        dangerouslySetInnerHTML={{ __html: page.content }} 
+        dangerouslySetInnerHTML={{ __html: safeHtml }} 
       />
     </InnerPageShell>
   );

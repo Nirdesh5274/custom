@@ -4,8 +4,12 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@custom.gov.in";
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "Admin@123";
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be set before running db:seed.");
+  }
 
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
@@ -30,21 +34,43 @@ async function main() {
     });
   }
 
-  const tickerValue =
-    "All IEC holders/CBs are requested to create their ICEGATE ID at the earliest and submit PAN based payment details.";
-  const existingTicker = await prisma.siteSetting.findUnique({ where: { key: "ticker_message" } });
-  if (existingTicker) {
-    await prisma.siteSetting.update({
-      where: { id: existingTicker.id },
-      data: { value: tickerValue },
-    });
-  } else {
-    await prisma.siteSetting.create({
-      data: {
-        key: "ticker_message",
-        value: tickerValue,
-      },
-    });
+  const defaultSettings: Array<{ key: string; value: string }> = [
+    {
+      key: "ticker_message",
+      value:
+        "All IEC holders/CBs are requested to create their ICEGATE ID at the earliest and submit PAN based payment details.",
+    },
+    {
+      key: "about_us_p1",
+      value:
+        "The Kolkata Customs Zone is headed by Chief Commissioner of Customs. There are four Commissionerates, namely Port, Airport and ACC, Preventive, and Appeals - each with dedicated jurisdiction and trade-facing operational responsibilities.",
+    },
+    {
+      key: "about_us_p2",
+      value:
+        "The subordinate cadres consist of the Appraising wing and Preventive wing, supported by ministerial teams in administration and accounts, delivering efficient governance and anti-smuggling operations.",
+    },
+    {
+      key: "about_us_p3",
+      value:
+        "Special Investigation Branch units and land customs stations ensure robust commercial fraud control, compliance, and border customs enforcement across the zone.",
+    },
+    {
+      key: "helpline_title",
+      value: "Need Assistance on Customs Procedures?",
+    },
+    {
+      key: "helpline_subtitle",
+      value:
+        "For trade support, baggage queries, and digital filing guidance, connect with helpline desks and grievance redressal channels.",
+    },
+  ];
+
+  for (const entry of defaultSettings) {
+    const existing = await prisma.siteSetting.findUnique({ where: { key: entry.key } });
+    if (!existing) {
+      await prisma.siteSetting.create({ data: entry });
+    }
   }
 
   const existing = await prisma.updateItem.count();

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/require-admin";
 import { galleryPatchSchema } from "@/lib/validators";
+import { enforceIpRateLimit, enforceTrustedOrigin } from "@/lib/request-security";
 
 export async function GET(
   _request: Request,
@@ -26,6 +27,20 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const originBlock = enforceTrustedOrigin(request);
+  if (originBlock) {
+    return originBlock;
+  }
+
+  const rateLimitBlock = enforceIpRateLimit(request, {
+    keyPrefix: "admin-gallery-write",
+    limit: 50,
+    windowMs: 60_000,
+  });
+  if (rateLimitBlock) {
+    return rateLimitBlock;
+  }
+
   const session = await requireAdmin();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -48,9 +63,23 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
+  const originBlock = enforceTrustedOrigin(request);
+  if (originBlock) {
+    return originBlock;
+  }
+
+  const rateLimitBlock = enforceIpRateLimit(request, {
+    keyPrefix: "admin-gallery-write",
+    limit: 50,
+    windowMs: 60_000,
+  });
+  if (rateLimitBlock) {
+    return rateLimitBlock;
+  }
+
   const session = await requireAdmin();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

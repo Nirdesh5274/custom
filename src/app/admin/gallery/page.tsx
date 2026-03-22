@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { DeleteGalleryButton } from "@/components/admin/delete-gallery-button";
 import { PublishToggleGalleryButton } from "@/components/admin/publish-toggle-gallery-button";
@@ -90,7 +91,13 @@ export default async function AdminGalleryPage({
         <div className="grid gap-4 md:grid-cols-2">
           {items.map((item: GalleryRow) => (
             <article key={item.id} className="admin-card overflow-hidden">
-              <img src={item.imageUrl} alt={item.title} className="h-48 w-full object-cover" />
+              <Image
+                src={item.imageUrl}
+                alt={item.title}
+                width={1200}
+                height={800}
+                className="h-48 w-full object-cover"
+              />
               <div className="p-4">
                 <h3 className="text-lg font-black text-[#12385b]">{item.title}</h3>
                 <p className="mt-1 text-sm text-[#4e637a]">{item.caption}</p>

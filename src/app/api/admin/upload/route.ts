@@ -1,14 +1,29 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/require-admin";
 import { prisma } from "@/lib/prisma";
+import { enforceIpRateLimit, enforceTrustedOrigin } from "@/lib/request-security";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
 const ALLOWED_TYPES = [
   "image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif",
-  "image/svg+xml", "application/pdf",
+  "application/pdf",
 ];
 
 export async function POST(request: Request) {
+  const originBlock = enforceTrustedOrigin(request);
+  if (originBlock) {
+    return originBlock;
+  }
+
+  const rateLimitBlock = enforceIpRateLimit(request, {
+    keyPrefix: "admin-upload",
+    limit: 30,
+    windowMs: 60_000,
+  });
+  if (rateLimitBlock) {
+    return rateLimitBlock;
+  }
+
   const session = await requireAdmin();
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
